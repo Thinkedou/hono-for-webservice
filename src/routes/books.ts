@@ -1,9 +1,11 @@
 import { Hono } from "hono";
+import { Book } from "@/models/books";
 
 const api = new Hono().basePath("/books");
 
 api.get("/", async (c) => {
-  return c.json({ msg: "books route!" });
+  const allB = await Book.find({});
+  return c.json(allB);
 });
 api.get("/:id", (c) => {
   const { id } = c.req.param();

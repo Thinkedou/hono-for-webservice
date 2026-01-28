@@ -1,7 +1,10 @@
 import { serve } from "@hono/node-server";
-import env from "../env";
+import { DbConnect } from "@/db";
 
+import env from "../env";
 import app from "./app";
+
+await DbConnect();
 
 // app.route("/api", books); // > donc /api/books
 serve({

@@ -5,7 +5,10 @@ import { z } from "zod";
 
 const envSchema = z.object({
   PORT: z.coerce.number().min(1000).default(3000),
-  SUPABASE_URL: z.string().url(),
+  MONGODB_USER: z.string(),
+  MONGODB_PWD: z.string(),
+  MONGODB_CLUSTER: z.string(),
+  MONGODB_DATABASE: z.string(),
 });
 
 // Validate `process.env` against our schema
