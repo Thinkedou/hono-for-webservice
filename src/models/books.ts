@@ -22,7 +22,7 @@ const bookSchema = new Schema<IBook>({
   genre: { type: String },
 });
 
-// Query middlewares
+// Mongoose Query middlewares
 bookSchema.post<IBook>("save", async (doc) => {
   console.log(doc);
 });
