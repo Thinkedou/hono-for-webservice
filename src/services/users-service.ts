@@ -35,7 +35,7 @@ export const userService = {
   },
   login: async (req): Promise<ServiceResponse<IUser>> => {
     const body = await req.json() as UserLogin;
-    const findUserByEmail = await User.findOne({ email: body.email }, { password: 1, email: 1, lastname: 1, firstname: 1 }).lean();
+    const findUserByEmail = await User.findOne({ email: body.email }, { roles: 1, password: 1, email: 1, lastname: 1, firstname: 1 }).lean();
     if (!findUserByEmail) {
       return { ok: false, message: "User not found" };
     }
@@ -44,6 +44,13 @@ export const userService = {
       return { ok: false, message: "auth failed" };
     }
     return { ok: true, data: findUserByEmail };
+  },
+  fetchRoleByUserId: async ({ _id}: { _id: string }): Promise<IUser> => {
+    const userWithRoles = await User.findById(_id).populate("roles");
+    if (!userWithRoles) {
+      throw new Error("User not found");
+    }
+    return userWithRoles;
   },
 
 };

@@ -1,14 +1,15 @@
 import { Hono } from "hono";
+import { every } from "hono/combine";
+import { isJwtValid } from "@/middlewares/check-jwt";
 import { isValidObjectIdMiddleware } from "@/middlewares/is-object-id";
-
 import { rbacGuard } from "@/middlewares/rbac-guard";
 import { Movie } from "@/models/movies";
 import { movieService } from "@/services/movies-service";
-import { NO_CONTENT, NOT_FOUND } from "@/shared/constants/http-status-codes";
+import { CREATED, NO_CONTENT, NOT_FOUND } from "@/shared/constants/http-status-codes";
 
 const api = new Hono();
 
-api.get("/", rbacGuard, async (c) => {
+api.get("/", async (c) => {
   const allMovies = await movieService.fetchAll(c.req);
   c.res.headers.set("X-Count", `${allMovies.xCount}`);
   return c.json(allMovies.data);
@@ -31,16 +32,10 @@ api.get("/:id/comments", isValidObjectIdMiddleware, async (c) => {
   return c.json(oneMovie);
 });
 
-api.post("/", async (c) => {
+api.post("/", every(isJwtValid, rbacGuard), async (c) => {
+  const body = await c.req.json();
 
-  // const body = await c.req.json<IMovie>();
-  // const newMovie = new Movie(body);
-  // try {
-  //    const tryToCreate = await newMovie.save();
-  //    return c.json(tryToCreate, CREATED);
-  // } catch (error) {
-  //   throw error
-  // }
+  return c.json(body, CREATED);
 });
 
 api.patch("/:id", isValidObjectIdMiddleware, async (c) => {
