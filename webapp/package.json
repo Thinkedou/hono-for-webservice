@@ -5,13 +5,14 @@
     "dev": "tsx watch --env-file=.env src/index.ts",
     "build": "tsup src/**/*.ts --format esm --out-dir dist",
     "lint": "eslint .",
-    "start": "node --env-file=./.env dist/index.js "
+    "start": "node --env-file=./.env dist/index.js"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.9",
     "@hono/standard-validator": "^0.2.2",
     "hono": "^4.11.7",
     "mongoose": "^9.1.5",
+    "redis": "^5.10.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

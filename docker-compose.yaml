@@ -8,6 +8,8 @@ services:
       env_file: .env
       ports:
         - ${SERVER_PORT}:${SERVER_PORT}
+      depends_on: 
+        - redis-cache
     nginx:
       image: reverse-proxy
       restart: always
@@ -18,3 +20,8 @@ services:
       env_file: .env
       ports:
           - ${NGINX_PORT}:${NGINX_PORT}
+    redis-cache:
+      container_name: redis
+      image: redis:alpine
+      ports:
+        - 6379:6379

@@ -8,4 +8,4 @@ RUN npm install pm2 -g
 RUN npm ci
 COPY . .
 
-CMD ["pm2-runtime","dist/index.js"]
+CMD ["pm2-runtime","ecosystem.config.cjs"]
