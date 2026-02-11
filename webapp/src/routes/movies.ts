@@ -6,20 +6,41 @@ import { rbacGuard } from "@/middlewares/rbac-guard";
 import { Movie } from "@/models/movies";
 import { movieService } from "@/services/movies-service";
 import { CREATED, NO_CONTENT, NOT_FOUND } from "@/shared/constants/http-status-codes";
-
+import { redisClient, getCache,setCache } from "@/lib/redis-client";
 const api = new Hono();
 
 api.get("/", async (c) => {
+  
+  const cacheKeys = c.req.query('countries');
+  const cachedMovie: string | null = await getCache(cacheKeys!);
+  if(cachedMovie){
+    console.log(`Cache hit for movie with id: ${cacheKeys}`);
+    c.res.headers.set("CACHE", "HIT");
+    return c.json(JSON.parse(cachedMovie));
+  }
   const allMovies = await movieService.fetchAll(c.req);
-  c.res.headers.set("X-Count", `${allMovies.xCount}`);
+  c.res.headers.set("CACHE", "MISS");
+  
+  await setCache(cacheKeys!, JSON.stringify(allMovies.data));
   return c.json(allMovies.data);
+ 
 });
 
 api.get("/:id", isValidObjectIdMiddleware, async (c) => {
+  const id = c.req.param("id");
+  const cachedMovie: string | null = await getCache(id);
+  if(cachedMovie){
+    console.log(`Cache hit for movie with id: ${id}`);
+    c.res.headers.set("CACHE", "HIT");
+    return c.json(JSON.parse(cachedMovie));
+  }
   const oneMovie = await movieService.fetchById(c.req);
+  
   if (!oneMovie) {
     return c.json({ message: "Movie not found" }, NOT_FOUND);
   }
+  c.res.headers.set("CACHE", "MISS");
+  await setCache(id, JSON.stringify(oneMovie));
   return c.json(oneMovie);
 });
 
